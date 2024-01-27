@@ -7,15 +7,15 @@
 function consoleInterface(worksheet) {
   const XLSX = require("xlsx");
 
-  console.log("witaj podaj jaki kierynek potrzebujesz");
-  console.log("dospenpe kierunki to: ");
+  console.log("Witaj, podaj jaki kierunek potrzebujesz.");
+  console.log("Dostępne kierunki to:");
 
   return new Promise((resolve, reject) => {
     // Pobierz wszystkie wiersze z arkusza
     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
     let kierunki = [];
-    // jeśli rows[0] zawoera I wyświtl
+    // Jeśli rows[0] zawiera "I", wyświetl
     for (let i = 0; i < rows[0].length; i++) {
       if (rows[0][i] && rows[0][i].includes("I")) {
         kierunki.push(rows[0][i]);
@@ -33,14 +33,13 @@ function consoleInterface(worksheet) {
       console.log(`${index + 1}. ${kierunek}`);
     });
 
-    // Get field from user
+    // Get field and group from the user
     const readline = require("readline").createInterface({
       input: process.stdin,
       output: process.stdout,
     });
 
     readline.question(`Podaj numer kierunku: `, (fieldNumber) => {
-      // Convert fieldNumber to array index
       const index = parseInt(fieldNumber) - 1;
 
       // Check if the entered index is valid
@@ -50,8 +49,16 @@ function consoleInterface(worksheet) {
           index: index,
         };
         console.log(`Wybrano kierunek: ${selectedField.name}`);
-        readline.close();
-        resolve(selectedField);
+
+        readline.question(
+          `Podaj numer grupy dla kierunku ${selectedField.name}: `,
+          (groupNumber) => {
+            selectedField.group = groupNumber;
+            console.log(`Wybrano grupę: ${selectedField.group}`);
+            readline.close();
+            resolve(selectedField);
+          }
+        );
       } else {
         console.log("Nieprawidłowy numer kierunku.");
         readline.close();
@@ -60,5 +67,6 @@ function consoleInterface(worksheet) {
     });
   });
 }
+
 // Export consoleInterface
 module.exports = consoleInterface;

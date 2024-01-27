@@ -78,21 +78,27 @@ END:VTIMEZONE`;
     } else if (field.index >= 1) {
       groupIndex = "Grupa_" + field.index;
     }
-
     if (jsonData[i][field.name]) {
       if (!jsonData[i][groupIndex]) {
         jsonData[i][groupIndex] = "wszyscy";
       }
-      // console.table(jsonData[i]);
 
-      //creare isc file
-      iscFile += `
+      let warunki = new RegExp("\\b" + field.group + "\\b");
+      if (
+        warunki.test(jsonData[i][groupIndex]) ||
+        jsonData[i][groupIndex] === "wszyscy" ||
+        jsonData[i][groupIndex] === "online"
+      ) {
+        // console.log(jsonData[i][groupIndex]);
+        //creare isc file
+        iscFile += `
 BEGIN:VEVENT
 DTSTART:${convertDate(jsonData[i]["data "], jsonData[i]["od"])}
 DTEND:${convertDate(jsonData[i]["data "], jsonData[i]["do"])}
 SUMMARY:${jsonData[i][field.name] + " (" + jsonData[i][groupIndex] + ")"}
 DESCRIPTION:${jsonData[i][groupIndex]}
 END:VEVENT`;
+      }
     } // console.log(iscFile);
   }
   iscFile += `
